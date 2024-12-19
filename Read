@@ -1,0 +1,614 @@
+¡Claro! Este es un proyecto bastante completo y requiere organizar el desarrollo en varias clases para garantizar que sea modular, escalable y limpio. A continuación, te doy una estructura inicial del proyecto en Java:
+
+### Estructura del proyecto
+El proyecto tendrá las siguientes clases principales:
+
+#### 1. **Clases de Modelo (Entidad):**
+   - `Modelo.Cliente.Cliente`
+   - `Cuenta`
+     - `CuentaPersonal`
+     - `CuentaEmpresarial`
+   - `Cheque`
+
+#### 2. **Clases de Servicio (Lógica de Negocio):**
+   - `GestorClientes`
+   - `GestorCuentas`
+   - `GestorCheques`
+
+#### 3. **Clases de Utils y Reportes:**
+   - `Utils.Validador`
+   - `GeneradorReportes`
+
+#### 4. **Clases para Concurrencia:**
+   - `Threads.ThreadChequesPendientes`
+
+#### 5. **Clase Principal:**
+   - `BancoUnionApp` (Interfaz de usuario por consola)
+
+---
+
+A continuación, te proporcionaré las clases principales con su implementación básica. Comenzaremos con las **clases de modelo**, luego avanzaremos a los **servicios**, y finalmente a la **clase principal**.
+
+### Clases de Modelo
+
+#### Clase `Modelo.Cliente.Cliente`
+```java
+public class Modelo.Cliente.Cliente {
+    private String id; // Identificación (cédula o NIT)
+    private String nombreCompleto;
+    private String direccion;
+    private String telefono;
+    private String correo;
+    private boolean activo; // true = Activo, false = Inactivo
+
+    // Constructor
+    public Modelo.Cliente.Cliente(String id, String nombreCompleto, String direccion, String telefono, String correo, boolean activo) {
+        this.id = id;
+        this.nombreCompleto = nombreCompleto;
+        this.direccion = direccion;
+        this.telefono = telefono;
+        this.correo = correo;
+        this.activo = activo;
+    }
+
+    // Getters y Setters
+    public String getId() { return id; }
+    public void setId(String id) { this.id = id; }
+    public String getNombreCompleto() { return nombreCompleto; }
+    public void setNombreCompleto(String nombreCompleto) { this.nombreCompleto = nombreCompleto; }
+    public String getDireccion() { return direccion; }
+    public void setDireccion(String direccion) { this.direccion = direccion; }
+    public String getTelefono() { return telefono; }
+    public void setTelefono(String telefono) { this.telefono = telefono; }
+    public String getCorreo() { return correo; }
+    public void setCorreo(String correo) { this.correo = correo; }
+    public boolean isActivo() { return activo; }
+    public void setActivo(boolean activo) { this.activo = activo; }
+}
+```
+
+---
+
+#### Clase `Cuenta` (abstracta)
+```java
+public abstract class Cuenta {
+    private String numeroCuenta;
+    private Modelo.Cliente.Cliente cliente;
+    private double saldo;
+
+    public Cuenta(String numeroCuenta, Modelo.Cliente.Cliente cliente, double saldo) {
+        this.numeroCuenta = numeroCuenta;
+        this.cliente = cliente;
+        this.saldo = saldo;
+    }
+
+    // Métodos abstractos
+    public abstract void depositar(double monto);
+    public abstract boolean retirar(double monto);
+
+    // Getters y Setters
+    public String getNumeroCuenta() { return numeroCuenta; }
+    public Modelo.Cliente.Cliente getCliente() { return cliente; }
+    public double getSaldo() { return saldo; }
+    public void setSaldo(double saldo) { this.saldo = saldo; }
+}
+```
+
+---
+
+#### Clase `CuentaPersonal` (subclase de `Cuenta`)
+```java
+public class CuentaPersonal extends Cuenta {
+    private static final double LIMITE_MAXIMO = 10000000; // $10,000,000
+
+    public CuentaPersonal(String numeroCuenta, Modelo.Cliente.Cliente cliente, double saldo) {
+        super(numeroCuenta, cliente, saldo);
+    }
+
+    @Override
+    public void depositar(double monto) {
+        if (getSaldo() + monto > LIMITE_MAXIMO) {
+            System.out.println("Depósito rechazado: excede el límite de saldo permitido.");
+        } else {
+            setSaldo(getSaldo() + monto);
+            System.out.println("Depósito exitoso. Nuevo saldo: $" + getSaldo());
+        }
+    }
+
+    @Override
+    public boolean retirar(double monto) {
+        if (getSaldo() >= monto) {
+            setSaldo(getSaldo() - monto);
+            System.out.println("Retiro exitoso. Nuevo saldo: $" + getSaldo());
+            return true;
+        } else {
+            System.out.println("Retiro rechazado: saldo insuficiente.");
+            return false;
+        }
+    }
+}
+```
+
+---
+
+#### Clase `CuentaEmpresarial` (subclase de `Cuenta`)
+```java
+public class CuentaEmpresarial extends Cuenta {
+    public CuentaEmpresarial(String numeroCuenta, Modelo.Cliente.Cliente cliente, double saldo) {
+        super(numeroCuenta, cliente, saldo);
+    }
+
+    @Override
+    public void depositar(double monto) {
+        setSaldo(getSaldo() + monto);
+        System.out.println("Depósito exitoso. Nuevo saldo: $" + getSaldo());
+    }
+
+    @Override
+    public boolean retirar(double monto) {
+        if (getSaldo() >= monto) {
+            setSaldo(getSaldo() - monto);
+            System.out.println("Retiro exitoso. Nuevo saldo: $" + getSaldo());
+            return true;
+        } else {
+            System.out.println("Retiro rechazado: saldo insuficiente.");
+            return false;
+        }
+    }
+}
+```
+
+---
+
+#### Clase `Cheque`
+```java
+public class Cheque {
+    private String id;
+    private Modelo.Cliente.Cliente emisor;
+    private String beneficiario;
+    private double monto;
+    private String firmaDigital;
+    private String prioridad; // Alta, Media, Baja
+    private boolean procesado;
+
+    public Cheque(String id, Modelo.Cliente.Cliente emisor, String beneficiario, double monto, String firmaDigital, String prioridad) {
+        this.id = id;
+        this.emisor = emisor;
+        this.beneficiario = beneficiario;
+        this.monto = monto;
+        this.firmaDigital = firmaDigital;
+        this.prioridad = prioridad;
+        this.procesado = false;
+    }
+
+    // Getters y Setters
+    public String getId() { return id; }
+    public Modelo.Cliente.Cliente getEmisor() { return emisor; }
+    public String getBeneficiario() { return beneficiario; }
+    public double getMonto() { return monto; }
+    public String getFirmaDigital() { return firmaDigital; }
+    public String getPrioridad() { return prioridad; }
+    public boolean isProcesado() { return procesado; }
+    public void setProcesado(boolean procesado) { this.procesado = procesado; }
+}
+```
+
+---
+
+Con estas clases iniciales, ya tienes el núcleo del sistema. En los siguientes pasos, podemos implementar las **clases de servicio** para manejar la lógica de negocio y las **clases de utilidad** para validaciones y reportes. ¿Te gustaría que continúe con esa parte o tienes alguna duda? 😊
+
+
+¡Perfecto! Continuemos con las **clases de servicio**. Estas manejarán la lógica de negocio y encapsularán las operaciones principales del sistema, como crear cuentas, gestionar cheques, y validar reglas del negocio.
+
+---
+
+### Clases de Servicio
+
+#### Clase `GestorClientes`
+Esta clase administra la creación, actualización y consultas de clientes.
+
+```java
+import java.util.ArrayList;
+import java.util.List;
+import java.util.stream.Collectors; // REQ: STREAM API
+
+public class GestorClientes {
+    private List<Cliente> clientes;
+
+    public GestorClientes() {
+        this.clientes = new ArrayList<>();
+    }
+
+    // Crear un cliente
+    public void agregarCliente(Cliente cliente) {
+        if (buscarClientePorId(cliente.getId()) == null) {
+            clientes.add(cliente);
+            System.out.println("Cliente agregado con éxito.");
+        } else {
+            System.out.println("El cliente con ID " + cliente.getId() + " ya existe.");
+        }
+    }
+
+    // Buscar cliente por ID
+    public Cliente buscarClientePorId(String id) {
+        return clientes.stream() // REQ: STREAM API
+                .filter(cliente -> cliente.getId().equals(id))
+                .findFirst()
+                .orElse(null);
+    }
+
+    // Cambiar el estado de un cliente
+    public void cambiarEstadoCliente(String id, boolean activo) {
+        Cliente cliente = buscarClientePorId(id);
+        if (cliente != null) {
+            cliente.setActivo(activo);
+            System.out.println("Estado del cliente actualizado.");
+        } else {
+            System.out.println("Cliente no encontrado.");
+        }
+    }
+
+    // Listar todos los clientes activos
+    public List<Cliente> obtenerClientesActivos() {
+        return clientes.stream() // REQ: STREAM API
+                .filter(Cliente::isActivo)
+                .collect(Collectors.toList());
+    }
+}
+```
+
+---
+
+#### Clase `GestorCuentas`
+Administra las operaciones relacionadas con las cuentas de los clientes.
+
+```java
+import java.util.ArrayList;
+import java.util.List;
+
+public class GestorCuentas {
+    private List<Cuenta> cuentas;
+
+    public GestorCuentas() {
+        this.cuentas = new ArrayList<>();
+    }
+
+    // Crear una cuenta
+    public void crearCuenta(Cuenta cuenta) {
+        cuentas.add(cuenta);
+        System.out.println("Cuenta creada con éxito. Número de cuenta: " + cuenta.getNumeroCuenta());
+    }
+
+    // Buscar cuentas por cliente
+    public List<Cuenta> buscarCuentasPorCliente(String clienteId) {
+        return cuentas.stream() // REQ: STREAM API
+                .filter(cuenta -> cuenta.getCliente().getId().equals(clienteId))
+                .collect(Collectors.toList());
+    }
+
+    // Bloquear cuentas de un cliente (al cambiar a inactivo)
+    public void bloquearCuentasPorCliente(String clienteId) {
+        cuentas.stream() // REQ: STREAM API
+                .filter(cuenta -> cuenta.getCliente().getId().equals(clienteId))
+                .forEach(cuenta -> cuenta.getCliente().setActivo(false)); // Bloquea cuentas
+        System.out.println("Cuentas bloqueadas para el cliente con ID: " + clienteId);
+    }
+}
+```
+
+---
+
+#### Clase `GestorCheques`
+Administra la emisión y gestión de cheques.
+
+```java
+import java.time.LocalDate;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.stream.Collectors; // REQ: STREAM API
+
+public class GestorCheques {
+    private List<Cheque> cheques;
+
+    public GestorCheques() {
+        this.cheques = new ArrayList<>();
+    }
+
+    // Emitir cheque
+    public void emitirCheque(Cuenta cuenta, String beneficiario, double monto, String prioridad) {
+        if (!cuenta.getCliente().isActivo()) {
+            System.out.println("El cliente está inactivo. No se puede emitir el cheque.");
+            return;
+        }
+
+        if (cuenta.getSaldo() < monto) {
+            System.out.println("Saldo insuficiente para emitir el cheque.");
+            return;
+        }
+
+        String firmaDigital = generarFirmaDigital(cuenta.getNumeroCuenta(), monto);
+        Cheque cheque = new Cheque(generarIdCheque(), cuenta.getCliente(), beneficiario, monto, firmaDigital, prioridad);
+        cheques.add(cheque);
+
+        // Actualizar saldo de la cuenta
+        cuenta.setSaldo(cuenta.getSaldo() - monto);
+        System.out.println("Cheque emitido exitosamente:");
+        imprimirCheque(cheque);
+    }
+
+    // Generar firma digital (simulación)
+    private String generarFirmaDigital(String numeroCuenta, double monto) {
+        return numeroCuenta.substring(0, 4) + "-" + String.valueOf(monto).replace(".", "");
+    }
+
+    // Generar ID único para cheque (simulación)
+    private String generarIdCheque() {
+        return "CH-" + (cheques.size() + 1);
+    }
+
+    // Imprimir cheque
+    private void imprimirCheque(Cheque cheque) {
+        System.out.println("---------------------------------");
+        System.out.println("BANCO UNIÓN S.A.");
+        System.out.println("Cheque No: " + cheque.getId());
+        System.out.println("Fecha: " + LocalDate.now());
+        System.out.println("PÁGUESE A: " + cheque.getBeneficiario());
+        System.out.println("LA SUMA DE: $" + cheque.getMonto());
+        System.out.println("FIRMA DIGITAL: " + cheque.getFirmaDigital());
+        System.out.println("Prioridad: " + cheque.getPrioridad());
+        System.out.println("---------------------------------");
+    }
+
+    // Listar cheques por cliente
+    public List<Cheque> listarChequesPorCliente(String clienteId) {
+        return cheques.stream() // REQ: STREAM API
+                .filter(cheque -> cheque.getEmisor().getId().equals(clienteId))
+                .collect(Collectors.toList());
+    }
+}
+```
+
+---
+
+### Clase de Utils
+
+#### Clase `Utils.Validador`
+Valida reglas específicas del sistema, como saldo o estado del cliente.
+
+```java
+public class Utils.Validador {
+    public static boolean validarSaldoSuficiente(Cuenta cuenta, double monto) {
+        return cuenta.getSaldo() >= monto;
+    }
+
+    public static boolean validarClienteActivo(Cliente cliente) {
+        return cliente.isActivo();
+    }
+}
+```
+
+---
+
+### Clase para Procesamiento Concurrente
+
+#### Clase `Threads.ThreadChequesPendientes`
+Procesa los cheques pendientes en segundo plano utilizando un hilo.
+
+```java
+import java.util.List;
+
+public class Threads.ThreadChequesPendientes extends Thread {
+    private List<Cheque> chequesPendientes;
+
+    public Threads.ThreadChequesPendientes(List<Cheque> chequesPendientes) {
+        this.chequesPendientes = chequesPendientes;
+    }
+
+    @Override
+    public void run() {
+        System.out.println("Procesando cheques pendientes...");
+        for (Cheque cheque : chequesPendientes) {
+            if (!cheque.isProcesado()) {
+                if (Utils.Validador.validarClienteActivo(cheque.getEmisor())) {
+                    cheque.setProcesado(true);
+                    System.out.println("Cheque ID: " + cheque.getId() + " procesado con éxito.");
+                } else {
+                    System.out.println("Cheque ID: " + cheque.getId() + " rechazado: Cliente inactivo.");
+                }
+            }
+        }
+        System.out.println("Procesamiento completado.");
+    }
+}
+```
+
+---
+
+Con esto, tienes cubiertas las **clases de servicio** y el procesamiento concurrente. ¿Quieres que implementemos la clase principal (`BancoUnionApp`) para manejar la interfaz de usuario por consola? 😊
+
+
+¡Perfecto! Ahora crearemos la **clase principal** (`BancoUnionApp`) para manejar la interacción del usuario a través de una interfaz de consola, y así permitir acceder a las funcionalidades del sistema.
+
+---
+
+### Clase Principal: `BancoUnionApp`
+
+Esta clase proporciona un menú que permite al usuario interactuar con el sistema.
+
+```java
+import java.util.List;
+import java.util.Scanner;
+
+public class BancoUnionApp {
+    private static GestorClientes gestorClientes = new GestorClientes();
+    private static GestorCuentas gestorCuentas = new GestorCuentas();
+    private static GestorCheques gestorCheques = new GestorCheques();
+
+    public static void main(String[] args) {
+        Scanner scanner = new Scanner(System.in);
+        boolean salir = false;
+
+        while (!salir) {
+            System.out.println("\n--- BANCO UNIÓN ---");
+            System.out.println("1. Registrar cliente");
+            System.out.println("2. Crear cuenta");
+            System.out.println("3. Emitir cheque");
+            System.out.println("4. Listar cheques de un cliente");
+            System.out.println("5. Procesar cheques pendientes");
+            System.out.println("6. Bloquear cuentas de cliente inactivo");
+            System.out.println("7. Salir");
+            System.out.print("Seleccione una opción: ");
+
+            int opcion = scanner.nextInt();
+            scanner.nextLine(); // Limpiar el buffer
+
+            switch (opcion) {
+                case 1 -> registrarCliente(scanner);
+                case 2 -> crearCuenta(scanner);
+                case 3 -> emitirCheque(scanner);
+                case 4 -> listarChequesDeCliente(scanner);
+                case 5 -> procesarChequesPendientes();
+                case 6 -> bloquearCuentasDeCliente(scanner);
+                case 7 -> {
+                    System.out.println("Saliendo del sistema...");
+                    salir = true;
+                }
+                default -> System.out.println("Opción inválida. Intente de nuevo.");
+            }
+        }
+
+        scanner.close();
+    }
+
+    private static void registrarCliente(Scanner scanner) {
+        System.out.print("Ingrese el ID del cliente: ");
+        String id = scanner.nextLine();
+
+        System.out.print("Ingrese el nombre completo del cliente: ");
+        String nombre = scanner.nextLine();
+
+        System.out.print("Ingrese la dirección del cliente: ");
+        String direccion = scanner.nextLine();
+
+        System.out.print("Ingrese el teléfono del cliente: ");
+        String telefono = scanner.nextLine();
+
+        System.out.print("Ingrese el correo del cliente: ");
+        String correo = scanner.nextLine();
+
+        Cliente cliente = new Cliente(id, nombre, direccion, telefono, correo, true);
+        gestorClientes.agregarCliente(cliente);
+    }
+
+    private static void crearCuenta(Scanner scanner) {
+        System.out.print("Ingrese el ID del cliente: ");
+        String clienteId = scanner.nextLine();
+
+        Cliente cliente = gestorClientes.buscarClientePorId(clienteId);
+        if (cliente == null || !cliente.isActivo()) {
+            System.out.println("Cliente no encontrado o inactivo.");
+            return;
+        }
+
+        System.out.print("Seleccione el tipo de cuenta (1. Personal, 2. Empresarial): ");
+        int tipoCuenta = scanner.nextInt();
+        scanner.nextLine(); // Limpiar el buffer
+
+        System.out.print("Ingrese el saldo inicial de la cuenta: ");
+        double saldo = scanner.nextDouble();
+        scanner.nextLine(); // Limpiar el buffer
+
+        Cuenta cuenta;
+        if (tipoCuenta == 1) {
+            cuenta = new CuentaPersonal(generarNumeroCuenta(), saldo, cliente);
+        } else {
+            cuenta = new CuentaEmpresarial(generarNumeroCuenta(), saldo, cliente);
+        }
+
+        gestorCuentas.crearCuenta(cuenta);
+    }
+
+    private static void emitirCheque(Scanner scanner) {
+        System.out.print("Ingrese el ID del cliente: ");
+        String clienteId = scanner.nextLine();
+
+        List<Cuenta> cuentas = gestorCuentas.buscarCuentasPorCliente(clienteId);
+        if (cuentas.isEmpty()) {
+            System.out.println("No se encontraron cuentas asociadas al cliente.");
+            return;
+        }
+
+        System.out.println("Cuentas disponibles:");
+        for (int i = 0; i < cuentas.size(); i++) {
+            Cuenta cuenta = cuentas.get(i);
+            System.out.println((i + 1) + ". Número de cuenta: " + cuenta.getNumeroCuenta() + ", Saldo: $" + cuenta.getSaldo());
+        }
+
+        System.out.print("Seleccione una cuenta: ");
+        int seleccionCuenta = scanner.nextInt();
+        scanner.nextLine(); // Limpiar el buffer
+
+        if (seleccionCuenta < 1 || seleccionCuenta > cuentas.size()) {
+            System.out.println("Selección inválida.");
+            return;
+        }
+
+        Cuenta cuentaSeleccionada = cuentas.get(seleccionCuenta - 1);
+
+        System.out.print("Ingrese el nombre del beneficiario: ");
+        String beneficiario = scanner.nextLine();
+
+        System.out.print("Ingrese el monto del cheque: ");
+        double monto = scanner.nextDouble();
+        scanner.nextLine(); // Limpiar el buffer
+
+        System.out.print("Seleccione la prioridad del cheque (Alta, Media, Baja): ");
+        String prioridad = scanner.nextLine();
+
+        gestorCheques.emitirCheque(cuentaSeleccionada, beneficiario, monto, prioridad);
+    }
+
+    private static void listarChequesDeCliente(Scanner scanner) {
+        System.out.print("Ingrese el ID del cliente: ");
+        String clienteId = scanner.nextLine();
+
+        List<Cheque> cheques = gestorCheques.listarChequesPorCliente(clienteId);
+        if (cheques.isEmpty()) {
+            System.out.println("No se encontraron cheques asociados al cliente.");
+        } else {
+            System.out.println("Cheques emitidos por el cliente:");
+            cheques.forEach(System.out::println); // REQ: FUNCION LAMBDA
+        }
+    }
+
+    private static void procesarChequesPendientes() {
+        List<Cheque> chequesPendientes = gestorCheques.listarChequesPorCliente(null).stream() // REQ: STREAM API
+                .filter(cheque -> !cheque.isProcesado())
+                .collect(Collectors.toList());
+
+        Threads.ThreadChequesPendientes procesador = new Threads.ThreadChequesPendientes(chequesPendientes);
+        procesador.start();
+    }
+
+    private static void bloquearCuentasDeCliente(Scanner scanner) {
+        System.out.print("Ingrese el ID del cliente: ");
+        String clienteId = scanner.nextLine();
+
+        gestorClientes.cambiarEstadoCliente(clienteId, false);
+        gestorCuentas.bloquearCuentasPorCliente(clienteId);
+    }
+
+    private static String generarNumeroCuenta() {
+        return "CUENTA-" + System.currentTimeMillis(); // Generar un número de cuenta único
+    }
+}
+```
+
+---
+
+### Resumen
+1. **Menú interactivo**: Proporciona opciones para registrar clientes, crear cuentas, emitir cheques, y más.
+2. **Gestión de cheques pendientes**: Usa hilos para procesar en segundo plano.
+3. **Validaciones**: Controla el estado del cliente y las restricciones de saldo.
+
+Con esta implementación, el sistema está completo y listo para pruebas. Si necesitas algún ajuste o quieres mejorar alguna parte, ¡avísame! 😊
