@@ -1,6 +1,6 @@
-package Modelo.Cuenta;
+package Modelo.Entities.Cuenta;
 
-import Modelo.Cliente.Cliente;
+import Modelo.Entities.Cliente;
 
 public abstract class Cuenta {
     private String numeroCuenta;

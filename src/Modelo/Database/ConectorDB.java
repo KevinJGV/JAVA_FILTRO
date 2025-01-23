@@ -1,17 +1,14 @@
-package Utils;
+package Modelo.Database;
 
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.SQLException;
 
 public class ConectorDB {
+    protected static ConectorDB instancia;
     protected static Connection conexion_DB;
 
-    public static Connection getConexion_DB() {
-        return conexion_DB;
-    }
-
-    public static void conectar(String HOST, String USUARIO, String CONTRA) {
+    private ConectorDB(String HOST, String USUARIO, String CONTRA) {
         try (
                 Connection conexion = DriverManager.getConnection(HOST, USUARIO, CONTRA);
         ) {
@@ -20,5 +17,16 @@ public class ConectorDB {
         } catch (SQLException e) {
             System.err.println("Error al conectarse con BancoUnion: " + e.getMessage());
         }
+    }
+
+    public static Connection getConexion_DB() {
+        return conexion_DB;
+    }
+
+    public static ConectorDB conectar(String HOST, String USUARIO, String CONTRA) {
+        if (instancia == null) {
+            instancia = new ConectorDB(HOST, USUARIO, CONTRA);
+        }
+        return instancia;
     }
 }

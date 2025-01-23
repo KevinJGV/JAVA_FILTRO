@@ -1,7 +1,6 @@
-package Modelo.Cheque;
+package Modelo.Entities;
 
-import Modelo.Cliente.Cliente;
-import Modelo.Cuenta.Cuenta;
+import Modelo.Entities.Cuenta.Cuenta;
 
 public class Cheque {
     private String id;

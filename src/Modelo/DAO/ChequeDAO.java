@@ -1,6 +1,7 @@
-package Modelo.Cheque;
+package Modelo.DAO;
 
-import Modelo.DAO;
+import Modelo.DAO.DAO;
+import Modelo.Entities.Cheque;
 
 import java.util.List;
 

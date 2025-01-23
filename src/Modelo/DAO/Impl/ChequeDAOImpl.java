@@ -1,19 +1,17 @@
-package Modelo.Cheque;
+package Modelo.DAO.Impl;
 
-import Modelo.Cliente.ClienteDAOImpl;
-import Modelo.Cuenta.Cuenta;
+import Modelo.DAO.ChequeDAO;
+import Modelo.Entities.Cuenta.Cuenta;
+import Modelo.Entities.Cheque;
 
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.stream.Collectors;
 
 public class ChequeDAOImpl extends ChequeDAO {
     private static ChequeDAOImpl instancia;
-
-    private final List<Cheque> cheques = new ArrayList<>();
 
     private ChequeDAOImpl() {
         super();
@@ -26,13 +24,9 @@ public class ChequeDAOImpl extends ChequeDAO {
         return instancia;
     }
 
-    protected void resetList() {
-        cheques.clear();
-    };
-
 
     public void create(Cuenta cuenta, String beneficiario, double monto, String prioridad) {
-        if (!cuenta.getCliente().getEstado()) {
+        if (cuenta.getCliente().getEstado().equals("Inactivo")) {
             System.out.println("El cliente está inactivo. No se puede emitir el cheque.");
             return;
         }
@@ -73,7 +67,7 @@ public class ChequeDAOImpl extends ChequeDAO {
 
     @Override
     public Cheque findById(Integer id) {
-        return cheques.stream()
+        return dataList.stream()
                 .filter(cheque -> cheque.getId().equals(id))
                 .findFirst()
                 .orElse(null);
@@ -81,31 +75,31 @@ public class ChequeDAOImpl extends ChequeDAO {
 
     @Override
     public List<Cheque> findAll() {
-        return new ArrayList<>(cheques);
+        return new ArrayList<>(dataList);
     }
 
 
     @Override
     public void delete(Integer id) {
-        cheques.removeIf(cheque -> cheque.getId().equals(id));
+        dataList.removeIf(cheque -> cheque.getId().equals(id));
     }
 
     @Override
     public List<Cheque> findByCliente(String clienteId) {
-        return cheques.stream()
+        return dataList.stream()
                 .filter(cheque -> cheque.getCuenta().getCliente().getId().equals(clienteId))
                 .toList();
     }
 
     @Override
     public List<Cheque> findPendientes() {
-        return cheques.stream()
+        return dataList.stream()
                 .filter(cheque -> !cheque.isProcesado())
                 .toList();
     }
 
     private String generarIdCheque() {
-        return "CH-" + (cheques.size() + 1);
+        return "CH-" + (dataList.size() + 1);
     }
 
     private String generarFirmaDigital(String numeroCuenta, double monto) {

@@ -1,4 +1,4 @@
-package Modelo.Cliente;
+package Modelo.Entities;
 
 import java.sql.Timestamp;
 
@@ -10,11 +10,11 @@ public class Cliente {
     private String direccion;
     private String telefono;
     private String correo;
-    private boolean estado;
+    private String estado;
     private Timestamp fechaRegistro;
     private Timestamp ultimaActividad;
 
-    public Cliente(String id, String nombre, String apellido, String direccion, String telefono, String correo, Boolean estado, Timestamp fechaRegistro, Timestamp ultimaActividad) {
+    public Cliente(String id, String nombre, String apellido, String direccion, String telefono, String correo, String estado, Timestamp fechaRegistro, Timestamp ultimaActividad) {
         this.id = id;
         this.nombre = nombre;
         this.apellido = apellido;
@@ -53,8 +53,8 @@ public class Cliente {
     public void setTelefono(String telefono) { this.telefono = telefono; }
     public String getCorreo() { return correo; }
     public void setCorreo(String correo) { this.correo = correo; }
-    public boolean getEstado() { return estado; }
-    public void setEstado(boolean estado) { this.estado = estado; }
+    public String getEstado() { return estado; }
+    public void setEstado(String estado) { this.estado = estado; }
 
     public Timestamp getFechaRegistro() {
         return fechaRegistro;

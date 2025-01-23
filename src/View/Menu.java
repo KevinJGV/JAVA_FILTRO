@@ -1,17 +1,17 @@
-import Modelo.Cheque.Cheque;
-import Modelo.Cheque.ChequeDAOImpl;
-import Modelo.Cliente.Cliente;
-import Modelo.Cliente.ClienteDAOImpl;
-import Modelo.Cuenta.Cuenta;
-import Modelo.Cuenta.CuentaDAOImpl;
-import Modelo.Cuenta.CuentaEmpresarial;
-import Modelo.Cuenta.CuentaPersonal;
-import Threads.ThreadChequesPendientes;
+package View;
+
+import Modelo.Entities.Cheque;
+import Modelo.DAO.Impl.ChequeDAOImpl;
+import Modelo.Entities.Cliente;
+import Modelo.DAO.Impl.ClienteDAOImpl;
+import Modelo.Entities.Cuenta.Cuenta;
+import Modelo.DAO.Impl.CuentaDAOImpl;
+import Modelo.Threads.ThreadChequesPendientes;
 import java.util.List;
 import java.util.Scanner;
 import java.util.stream.Collectors;
 
-public class BancoUnionApp {
+public class Menu {
     private static ClienteDAOImpl gestorClientes = ClienteDAOImpl.instanciar();
     private static CuentaDAOImpl gestorCuentas = CuentaDAOImpl.instanciar();
     private static ChequeDAOImpl gestorCheques = ChequeDAOImpl.instanciar();

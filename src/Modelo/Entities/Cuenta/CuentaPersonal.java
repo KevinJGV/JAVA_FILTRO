@@ -1,6 +1,6 @@
-package Modelo.Cuenta;
+package Modelo.Entities.Cuenta;
 
-import Modelo.Cliente.Cliente;
+import Modelo.Entities.Cliente;
 
 public class CuentaPersonal extends Cuenta {
     private static final double Limite = 10000000;

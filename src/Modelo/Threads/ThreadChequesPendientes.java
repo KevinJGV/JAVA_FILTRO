@@ -1,6 +1,6 @@
-package Threads;
+package Modelo.Threads;
 
-import Modelo.Cheque.Cheque;
+import Modelo.Entities.Cheque;
 import Utils.Validador;
 
 import java.util.List;

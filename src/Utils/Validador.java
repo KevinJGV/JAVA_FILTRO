@@ -1,7 +1,7 @@
 package Utils;
 
-import Modelo.Cliente.Cliente;
-import Modelo.Cuenta.Cuenta;
+import Modelo.Entities.Cliente;
+import Modelo.Entities.Cuenta.Cuenta;
 
 public class Validador {
     public static boolean validarSaldoSuficiente(Cuenta cuenta, double monto) {

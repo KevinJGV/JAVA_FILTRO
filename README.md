@@ -103,7 +103,7 @@ Cada cliente debe estar registrado con los siguientes detalles fundamentales:
     
     -   Generar un listado de cheques emitidos, mostrando:
         
-        -   Modelo.Cliente.Cliente emisor.
+        -   Modelo.Entities.Cliente emisor.
         -   Beneficiario.
         -   Monto.
         -   Prioridad.
@@ -133,28 +133,28 @@ Fecha de procesamiento: 2023-12-12
 ---------------------------------
 
 Cheque ID: 123456
-Modelo.Cliente.Cliente: Juan Pérez
+Modelo.Entities.Cliente: Juan Pérez
 Beneficiario: María Gómez
 Monto: $500,000
 Estado: Procesado
 Razón: -
 
 Cheque ID: 123457
-Modelo.Cliente.Cliente: Ana López
+Modelo.Entities.Cliente: Ana López
 Beneficiario: Pedro Ruiz
 Monto: $1,200,000
 Estado: Rechazado
 Razón: Saldo insuficiente
 
 Cheque ID: 123458
-Modelo.Cliente.Cliente: José Martínez
+Modelo.Entities.Cliente: José Martínez
 Beneficiario: Carla Torres
 Monto: $350,000
 Estado: Procesado
 Razón: -
 
 Cheque ID: 123459
-Modelo.Cliente.Cliente: Laura Gómez
+Modelo.Entities.Cliente: Laura Gómez
 Beneficiario: Javier López
 Monto: $2,000,000
 Estado: Rechazado

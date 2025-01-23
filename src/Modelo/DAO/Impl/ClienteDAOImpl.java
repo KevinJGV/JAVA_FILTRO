@@ -1,14 +1,15 @@
-package Modelo.Cliente;
+package Modelo.DAO.Impl;
+
+import Modelo.DAO.ClienteDAO;
+import Modelo.Entities.Cliente;
 
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.util.ArrayList;
 import java.util.List;
 
 public class ClienteDAOImpl extends ClienteDAO {
     private static ClienteDAOImpl instancia;
-    private final List<Cliente> clientes = new ArrayList<>();
 
     private ClienteDAOImpl() {
         super();
@@ -20,11 +21,6 @@ public class ClienteDAOImpl extends ClienteDAO {
         }
         return instancia;
     }
-
-    protected void resetList() {
-        clientes.clear();
-    };
-
 
     public void create(String id,String nombre,String apellido, String direccion,String telefono,String correo) {
         try {
@@ -48,7 +44,7 @@ public class ClienteDAOImpl extends ClienteDAO {
 
     @Override
     public Cliente findById(String id) {
-        return clientes.stream() // REQ: STREAM API
+        return dataList.stream() // REQ: STREAM API
                 .filter(cliente -> cliente.getId().equals(id))
                 .findFirst()
                 .orElse(null);
@@ -56,11 +52,11 @@ public class ClienteDAOImpl extends ClienteDAO {
 
     @Override
     public List<Cliente> findAll() {
-        if (clientes.size() < 1) {
+        if (dataList.size() < 1) {
             try {
                 ResultSet res = conexionDB.createStatement().executeQuery("SELECT identificacion, nombre, apellido, direccion, telefono, correo, estado, fecha_registro, ultima_actividad FROM clientes;");
                 while (res.next()) {
-                    clientes.add(
+                    dataList.add(
                             new Cliente(
                                     res.getString("identificacion"),
                                     res.getString("nombre"),
@@ -78,18 +74,18 @@ public class ClienteDAOImpl extends ClienteDAO {
                 System.err.println("Error al recuperar los datos de la tabla controlaccesospersonal: " + e.getMessage());
             }
         }
-        return clientes;
+        return dataList;
     }
 
     @Override
     public void delete(String id) {
-        clientes.removeIf(cliente -> cliente.getId().equals(id)); // REQ: FUNCION LAMBDA
+        dataList.removeIf(cliente -> cliente.getId().equals(id)); // REQ: FUNCION LAMBDA
     }
 
     @Override
-    public List<Cliente> findByEstado(boolean activo) {
-        return clientes.stream() // REQ: STREAM API
-                .filter(cliente -> cliente.isEstado() == activo)
+    public List<Cliente> findByEstado(String activo) {
+        return dataList.stream() // REQ: STREAM API
+                .filter(cliente -> cliente.getEstado().equals(activo))
                 .toList();
     }
 }

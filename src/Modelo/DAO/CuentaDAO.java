@@ -1,6 +1,7 @@
-package Modelo.Cuenta;
+package Modelo.DAO;
 
-import Modelo.DAO;
+import Modelo.DAO.DAO;
+import Modelo.Entities.Cuenta.Cuenta;
 
 import java.util.List;
 

@@ -1,7 +1,7 @@
-package Modelo.Cuenta;
+package Modelo.DAO.Impl;
 
-import Modelo.Cheque.ChequeDAOImpl;
-import Modelo.Cliente.Cliente;
+import Modelo.DAO.CuentaDAO;
+import Modelo.Entities.Cuenta.Cuenta;
 
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
@@ -11,8 +11,6 @@ import java.util.List;
 public class CuentaDAOImpl extends CuentaDAO {
 
     private static CuentaDAOImpl instancia;
-
-    private final List<Cuenta> cuentas = new ArrayList<>();
 
     private CuentaDAOImpl() {
         super();
@@ -24,12 +22,6 @@ public class CuentaDAOImpl extends CuentaDAO {
         }
         return instancia;
     }
-
-    @Override
-    protected void resetList() {
-        cuentas.clear();
-    }
-
     public void create(Integer id, Integer tipo, Double saldo) {
         try {
             PreparedStatement pst = conexionDB.prepareStatement(
@@ -49,7 +41,7 @@ public class CuentaDAOImpl extends CuentaDAO {
 
     @Override
     public Cuenta findById(String id) {
-        return cuentas.stream()
+        return dataList.stream()
                 .filter(cuenta -> cuenta.getNumeroCuenta().equals(id))
                 .findFirst()
                 .orElse(null);
@@ -57,25 +49,25 @@ public class CuentaDAOImpl extends CuentaDAO {
 
     @Override
     public List<Cuenta> findAll() {
-        return new ArrayList<>(cuentas);
+        return new ArrayList<>(dataList);
     }
 
 
     @Override
     public void delete(String id) {
-        cuentas.removeIf(cuenta -> cuenta.getNumeroCuenta().equals(id));
+        dataList.removeIf(cuenta -> cuenta.getNumeroCuenta().equals(id));
     }
 
     @Override
     public List<Cuenta> findByCliente(String clienteId) {
-        return cuentas.stream()
+        return dataList.stream()
                 .filter(cuenta -> cuenta.getCliente().getId().equals(clienteId))
                 .toList();
     }
 
     @Override
     public void setEstadoCuentasPorCliente(String clienteId) {
-        cuentas.stream()
+        dataList.stream()
                 .filter(cuenta -> cuenta.getCliente().getId().equals(clienteId))
                 .forEach(cuenta -> cuenta.setEstado(true)); // REQ: STREAM API
     }
